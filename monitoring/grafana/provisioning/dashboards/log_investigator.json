@@ -1,0 +1,32 @@
+{
+  "title": "Application Log Investigator",
+  "uid": "log_investigator",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "refresh": "10s",
+  "time": { "from": "now-30m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Docker Container Log Stream Frequency",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 6 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [{ "expr": "count_over_time({job=\"docker\"}[1m])", "legendFormat": "Lines/Min" }]
+    },
+    {
+      "id": 2,
+      "title": "Live Standard Streams (Loki)",
+      "type": "logs",
+      "gridPos": { "x": 0, "y": 6, "w": 24, "h": 14 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [{ "expr": "{job=\"docker\"}", "legendFormat": "" }],
+      "options": {
+        "showLabels": true,
+        "wrapLogMessage": true,
+        "enableLogDetails": true,
+        "sortOrder": "Descending"
+      }
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "title": "Go Runtime & GC Health",
+  "uid": "go_runtime_health",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "refresh": "10s",
+  "time": { "from": "now-30m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Total Completed GC Cycles",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 0, "w": 8, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "go_gc_cycles_total_gc_cycles_total", "legendFormat": "cycles" }]
+    },
+    {
+      "id": 2,
+      "title": "Cgo Calls Count",
+      "type": "stat",
+      "gridPos": { "x": 8, "y": 0, "w": 8, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "go_cgo_go_to_c_calls_calls_total", "legendFormat": "calls" }]
+    },
+    {
+      "id": 3,
+      "title": "Deprecated Flags In Use",
+      "type": "stat",
+      "gridPos": { "x": 16, "y": 0, "w": 8, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "deprecated_flags_inuse_total", "legendFormat": "flags" }]
+    },
+    {
+      "id": 4,
+      "title": "Go CPU Usage Profile (per min)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "rate(go_cpu_classes_user_cpu_seconds_total[1m]) * 60", "legendFormat": "User Code" },
+        { "expr": "rate(go_cpu_classes_gc_total_cpu_seconds_total[1m]) * 60", "legendFormat": "GC Cycles" },
+        { "expr": "rate(go_cpu_classes_idle_cpu_seconds_total[1m]) * 60", "legendFormat": "Idle Threading" }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "GC Pause Latency Spectrum",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "go_gc_duration_seconds", "legendFormat": "p{{quantile}}" }],
+      "fieldConfig": { "defaults": { "unit": "s", "custom": { "lineInterpolation": "smooth" } } }
+    }
+  ]
+}
