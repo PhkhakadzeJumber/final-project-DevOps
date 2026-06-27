@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://final-project-devops-production.up.railway.app";
 
 interface Todo {
   id: number;
