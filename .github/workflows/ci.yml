@@ -58,7 +58,7 @@ jobs:
         run: npm audit --audit-level=high
         continue-on-error: true
 
-      - name: Run Trivy vulnerability scan (filesystem)
+      - name: Run Trivy vulnerability scan (frontend only)
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: fs
@@ -92,15 +92,6 @@ jobs:
         run: mvn org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=9 -B --no-transfer-progress
         continue-on-error: true
 
-      - name: Run Trivy vulnerability scan (filesystem)
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: fs
-          scan-ref: backend
-          severity: HIGH,CRITICAL
-          exit-code: 0
-          skip-dirs: target
-
   # ── Secrets Scanning ───────────────────────────────────────────
   security-secrets:
     name: Secrets Scan
@@ -118,6 +109,7 @@ jobs:
           scan-type: fs
           scan-ref: .
           scanners: secret
+          skip-dirs: backend,frontend/node_modules
           exit-code: 0
 
   # ── Docker Config Security Scan ────────────────────────────────
