@@ -80,10 +80,16 @@ jobs:
         with:
           java-version: 21
           distribution: temurin
+          cache: maven
+
+      - name: Pre-populate Maven cache
+        working-directory: backend
+        run: mvn dependency:resolve -B --no-transfer-progress
+        continue-on-error: true
 
       - name: Run OWASP Dependency Check
         working-directory: backend
-        run: mvn org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=9
+        run: mvn org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=9 -B --no-transfer-progress
         continue-on-error: true
 
       - name: Run Trivy vulnerability scan (filesystem)
@@ -93,6 +99,7 @@ jobs:
           scan-ref: backend
           severity: HIGH,CRITICAL
           exit-code: 0
+          skip-dirs: target
 
   # ── Secrets Scanning ───────────────────────────────────────────
   security-secrets:
