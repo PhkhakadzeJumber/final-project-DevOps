@@ -12,7 +12,7 @@
       "type": "timeseries",
       "gridPos": { "x": 0, "y": 0, "w": 24, "h": 6 },
       "datasource": { "type": "loki", "uid": "loki" },
-      "targets": [{ "expr": "count_over_time({job=\"docker\"}[1m])", "legendFormat": "Lines/Min" }]
+      "targets": [{ "expr": "count_over_time({job=~\".+\"}[1m])", "legendFormat": "Lines/Min" }]
     },
     {
       "id": 2,
@@ -20,7 +20,7 @@
       "type": "logs",
       "gridPos": { "x": 0, "y": 6, "w": 24, "h": 14 },
       "datasource": { "type": "loki", "uid": "loki" },
-      "targets": [{ "expr": "{job=\"docker\"}", "legendFormat": "" }],
+      "targets": [{ "expr": "{job=~\".+\"}", "legendFormat": "" }],
       "options": { "showLabels": true, "wrapLogMessage": true, "enableLogDetails": true, "sortOrder": "Descending" }
     }
   ]
