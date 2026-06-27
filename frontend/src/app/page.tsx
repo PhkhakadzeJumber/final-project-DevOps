@@ -146,7 +146,7 @@ export default function Home() {
                 {/* Checkbox */}
                 <button
                   onClick={() => toggleTodo(todo)}
-                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
                     todo.completed
                       ? "bg-indigo-600 border-indigo-600"
                       : "border-zinc-600 hover:border-indigo-500"
