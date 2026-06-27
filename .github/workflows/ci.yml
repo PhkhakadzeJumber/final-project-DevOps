@@ -7,6 +7,7 @@ on:
     branches: [main]
 
 jobs:
+  # ── Build & Lint ───────────────────────────────────────────────
   build:
     name: Build & Lint Frontend
     runs-on: ubuntu-latest
@@ -33,3 +34,98 @@ jobs:
       - name: Build
         working-directory: frontend
         run: npm run build
+
+  # ── Frontend Dependency Scanning ───────────────────────────────
+  security-frontend:
+    name: Frontend Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run npm audit
+        working-directory: frontend
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Run Trivy vulnerability scan (filesystem)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: frontend
+          severity: HIGH,CRITICAL
+          exit-code: 0
+
+  # ── Backend Dependency Scanning ────────────────────────────────
+  security-backend:
+    name: Backend Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+
+      - name: Run OWASP Dependency Check
+        working-directory: backend
+        run: mvn org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=9
+        continue-on-error: true
+
+      - name: Run Trivy vulnerability scan (filesystem)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: backend
+          severity: HIGH,CRITICAL
+          exit-code: 0
+
+  # ── Secrets Scanning ───────────────────────────────────────────
+  security-secrets:
+    name: Secrets Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Trivy secret scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: secret
+          exit-code: 0
+
+  # ── Docker Config Security Scan ────────────────────────────────
+  security-docker:
+    name: Docker & IaC Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy config scan (Dockerfile + compose)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: config
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          exit-code: 0
