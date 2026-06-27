@@ -1,0 +1,45 @@
+{
+  "title": "JVM Performance & CPU Status [From: Prometheus]",
+  "uid": "jvm_performance",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "refresh": "10s",
+  "time": { "from": "now-15m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Application Uptime",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 0, "w": 8, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "process_uptime_seconds", "legendFormat": "Seconds" }]
+    },
+    {
+      "id": 2,
+      "title": "JVM Live Threads",
+      "type": "stat",
+      "gridPos": { "x": 8, "y": 0, "w": 8, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "jvm_threads_live_threads", "legendFormat": "Threads" }]
+    },
+    {
+      "id": 3,
+      "title": "App Ready Time",
+      "type": "stat",
+      "gridPos": { "x": 16, "y": 0, "w": 8, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [{ "expr": "application_ready_time_seconds", "legendFormat": "seconds" }]
+    },
+    {
+      "id": 4,
+      "title": "CPU Usage Breakdown",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 4, "w": 24, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "process_cpu_usage", "legendFormat": "JVM Process CPU" },
+        { "expr": "system_cpu_usage", "legendFormat": "Total System CPU" }
+      ]
+    }
+  ]
+}
