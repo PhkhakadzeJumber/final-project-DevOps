@@ -19,21 +19,20 @@ export default function Home() {
   const [editingTitle, setEditingTitle] = useState("");
   const editInputRef = useRef<HTMLInputElement>(null);
 
-  const fetchTodos = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/todos`);
-      if (!res.ok) throw new Error("Failed to fetch todos");
-      const data = await res.json();
-      setTodos(data);
-    } catch {
-      setError("Could not connect to the server.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchTodos();
+    const loadTodos = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/todos`);
+        if (!res.ok) throw new Error("Failed to fetch todos");
+        const data = await res.json();
+        setTodos(data);
+      } catch {
+        setError("Could not connect to the server.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadTodos();
   }, []);
 
   useEffect(() => {
