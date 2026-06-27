@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
@@ -15,6 +15,9 @@ export default function Home() {
   const [newTitle, setNewTitle] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingTitle, setEditingTitle] = useState("");
+  const editInputRef = useRef<HTMLInputElement>(null);
 
   const fetchTodos = async () => {
     try {
@@ -32,6 +35,12 @@ export default function Home() {
   useEffect(() => {
     fetchTodos();
   }, []);
+
+  useEffect(() => {
+    if (editingId !== null) {
+      editInputRef.current?.focus();
+    }
+  }, [editingId]);
 
   const addTodo = async () => {
     const title = newTitle.trim();
@@ -63,6 +72,33 @@ export default function Home() {
       setTodos((prev) => prev.map((t) => (t.id === todo.id ? updated : t)));
     } catch {
       setError("Failed to update todo.");
+    }
+  };
+
+  const startEdit = (todo: Todo) => {
+    setEditingId(todo.id);
+    setEditingTitle(todo.title);
+  };
+
+  const saveEdit = async (todo: Todo) => {
+    const title = editingTitle.trim();
+    if (!title || title === todo.title) {
+      setEditingId(null);
+      return;
+    }
+    try {
+      const res = await fetch(`${API_URL}/api/todos/${todo.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, completed: todo.completed }),
+      });
+      if (!res.ok) throw new Error();
+      const updated = await res.json();
+      setTodos((prev) => prev.map((t) => (t.id === todo.id ? updated : t)));
+    } catch {
+      setError("Failed to update todo.");
+    } finally {
+      setEditingId(null);
     }
   };
 
@@ -159,14 +195,33 @@ export default function Home() {
                   )}
                 </button>
 
-                {/* Title */}
-                <span
-                  className={`flex-1 text-sm transition-colors ${
-                    todo.completed ? "line-through text-zinc-500" : "text-zinc-100"
-                  }`}
-                >
-                  {todo.title}
-                </span>
+                {/* Title / Edit input */}
+                {editingId === todo.id ? (
+                  <input
+                    ref={editInputRef}
+                    type="text"
+                    value={editingTitle}
+                    onChange={(e) => setEditingTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") saveEdit(todo);
+                      if (e.key === "Escape") setEditingId(null);
+                    }}
+                    onBlur={() => saveEdit(todo)}
+                    className="flex-1 bg-zinc-800 border border-indigo-500 rounded px-2 py-1 text-sm text-zinc-100 focus:outline-none"
+                  />
+                ) : (
+                  <span
+                    onDoubleClick={() => !todo.completed && startEdit(todo)}
+                    title={!todo.completed ? "Double-click to edit" : ""}
+                    className={`flex-1 text-sm transition-colors ${
+                      todo.completed
+                        ? "line-through text-zinc-500"
+                        : "text-zinc-100 cursor-pointer hover:text-indigo-300"
+                    }`}
+                  >
+                    {todo.title}
+                  </span>
+                )}
 
                 {/* Delete */}
                 <button
@@ -190,6 +245,14 @@ export default function Home() {
             <span>{todos.filter((t) => t.completed).length} completed</span>
           </div>
         )}
+
+        {/* Hint */}
+        {todos.some((t) => !t.completed) && (
+          <p className="mt-4 text-center text-xs text-zinc-700">
+            Double-click a task title to edit it
+          </p>
+        )}
+
       </div>
     </main>
   );
