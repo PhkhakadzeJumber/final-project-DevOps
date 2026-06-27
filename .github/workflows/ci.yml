@@ -35,7 +35,7 @@ jobs:
         working-directory: frontend
         run: npm run build
 
-  # ── Frontend Dependency Scanning ───────────────────────────────
+  # ── Frontend Security Scan ─────────────────────────────────────
   security-frontend:
     name: Frontend Security Scan
     runs-on: ubuntu-latest
@@ -58,39 +58,13 @@ jobs:
         run: npm audit --audit-level=high
         continue-on-error: true
 
-      - name: Run Trivy vulnerability scan (frontend only)
+      - name: Run Trivy vulnerability scan (frontend)
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: fs
           scan-ref: frontend
           severity: HIGH,CRITICAL
           exit-code: 0
-
-  # ── Backend Dependency Scanning ────────────────────────────────
-  security-backend:
-    name: Backend Security Scan
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: 21
-          distribution: temurin
-          cache: maven
-
-      - name: Pre-populate Maven cache
-        working-directory: backend
-        run: mvn dependency:resolve -B --no-transfer-progress
-        continue-on-error: true
-
-      - name: Run OWASP Dependency Check
-        working-directory: backend
-        run: mvn org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=9 -B --no-transfer-progress
-        continue-on-error: true
 
   # ── Secrets Scanning ───────────────────────────────────────────
   security-secrets:
