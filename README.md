@@ -101,6 +101,9 @@ Every push to `main` triggers the full pipeline automatically. No manual steps r
 
 The CD pipeline only runs on pushes to `main`, not on pull requests — ensuring only reviewed, passing code reaches production.
 
+![CI/CD Pipeline Success](docs/ci-cd-success.png)
+*GitHub Actions CI and CD workflows passing successfully on push to main*
+
 ### Deployment Targets
 
 | Service | Platform | URL |
@@ -112,6 +115,9 @@ The CD pipeline only runs on pushes to `main`, not on pull requests — ensuring
 ### Rolling Update Strategy
 
 Vercel deploys new versions gradually — the new deployment becomes live only after it is built and verified. The previous version stays live until the new one is ready. If the deploy step fails, the `rollback` job in `cd.yml` automatically triggers `vercel rollback` to restore the previous working version instantly with zero downtime.
+
+![Railway Backend Deployment](docs/railway-backend-deployment.png)
+*Railway showing backend service running and connected to managed PostgreSQL*
 
 ---
 
@@ -171,6 +177,9 @@ docker compose down -v
 ./scripts/health-check.sh
 ```
 
+![Health Check Output](docs/health-check.png)
+*health-check.sh reporting both Vercel frontend and Railway backend as UP with HTTP 200*
+
 ---
 
 ## Security Implementation
@@ -181,16 +190,29 @@ Security is integrated directly into the CI pipeline and runs automatically on e
 
 `npm audit` checks all Node.js packages against the npm advisory database for known CVEs. Trivy performs an additional deep filesystem scan of the `frontend/` directory for vulnerable packages.
 
+![Frontend Security Scan](docs/security-frontend-scan.png)
+*Trivy filesystem scan results for the frontend directory*
+
 ### 2. Secrets Scanning
 
 Trivy scans the entire repository on every push for accidentally committed secrets, API keys, tokens, and passwords. The `backend/` and `frontend/node_modules` directories are excluded to avoid false positives from dependency files.
+
+![Secrets Scan](docs/security-secret-scan.png)
+*Trivy secrets scan passing with no secrets detected in the repository*
 
 ### 3. Docker and IaC Security Scanning
 
 Trivy config scan checks all Dockerfiles and `docker-compose.yml` for security misconfigurations — such as containers running as root, exposed sensitive ports, or missing health checks.
 
+![Docker Security Scan](docs/security-docker-scan.png)
+*Trivy config scan results on Dockerfiles and docker-compose.yml*
+
 ### 4. Container Image Scanning
+
 Trivy scans the built backend Docker image for vulnerabilities in the OS packages, Java runtime, and installed dependencies inside the container.
+
+![Container Image Scan](docs/security-container-image-scan.png)
+*Trivy image scan results for the backend Docker image*
 
 ### Security Tools Used
 
