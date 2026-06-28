@@ -15,7 +15,7 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-# 🚀 ADD THIS LINE TO PATCH THE FRONTEND OS LAYER:
+# Patch base OS vulnerabilities
 RUN apk update && apk upgrade --no-cache
 
 ENV NODE_ENV=production
@@ -23,6 +23,9 @@ ENV NODE_ENV=production
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+
+# Use the built-in non-root 'node' user provided by the base image
+USER node
 
 EXPOSE 3000
 

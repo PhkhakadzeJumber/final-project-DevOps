@@ -16,10 +16,20 @@ FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
-# 🚀 ADD THIS LINE RIGHT HERE TO PATCH THE BASE OS VULNERABILITIES:
+# Patch base OS vulnerabilities
 RUN apk update && apk upgrade --no-cache
 
+# Create a safe, non-root system user and group
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Copy the built JAR from Stage 1
 COPY --from=builder /app/target/*.jar app.jar
+
+# Give our new user ownership of the application file
+RUN chown appuser:appgroup app.jar
+
+# Tell Docker to run the container as the non-root user
+USER appuser
 
 EXPOSE 8080
 
