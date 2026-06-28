@@ -102,3 +102,23 @@ jobs:
           scan-ref: .
           severity: HIGH,CRITICAL
           exit-code: 0
+  
+  # ── Container Image Scanning ───────────────────────────────────
+  security-image:
+    name: Container Image Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build backend Docker image
+        run: docker build -t todolist-backend:latest ./backend
+
+      - name: Run Trivy image scan (backend)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: image
+          image-ref: todolist-backend:latest
+          severity: HIGH,CRITICAL
+          exit-code: 0

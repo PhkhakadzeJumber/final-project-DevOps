@@ -189,12 +189,16 @@ Trivy scans the entire repository on every push for accidentally committed secre
 
 Trivy config scan checks all Dockerfiles and `docker-compose.yml` for security misconfigurations — such as containers running as root, exposed sensitive ports, or missing health checks.
 
+### 4. Container Image Scanning
+Trivy scans the built backend Docker image for vulnerabilities in the OS packages, Java runtime, and installed dependencies inside the container.
+
 ### Security Tools Used
 
 | Tool | Purpose | Free |
 |---|---|---|
 | Trivy | Filesystem, secrets, and IaC config scanning | ✅ |
 | npm audit | Node.js package CVE scanning | ✅ |
+| Trivy image scan | Docker container image CVE scanning | ✅ |
 
 ---
 
