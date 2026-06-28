@@ -16,6 +16,9 @@ FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
+# 🚀 ADD THIS LINE RIGHT HERE TO PATCH THE BASE OS VULNERABILITIES:
+RUN apk update && apk upgrade --no-cache
+
 COPY --from=builder /app/target/*.jar app.jar
 
 EXPOSE 8080
