@@ -123,6 +123,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./monitoring/loki/promtail-config.yml:/etc/promtail/config.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock
     command: -config.file=/etc/promtail/config.yml
     logging:
